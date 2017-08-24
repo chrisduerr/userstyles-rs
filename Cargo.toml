@@ -1,0 +1,8 @@
+[package]
+name = "userstyles"
+version = "0.1.0"
+license = "GPL-3.0"
+readme = "README.md"
+authors = ["Christian Dürr <contact@christianduerr.com>"]
+
+[dependencies]
