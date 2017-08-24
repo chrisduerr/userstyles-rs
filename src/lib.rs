@@ -1,127 +1,52 @@
-use std::time::SystemTime;
+#[macro_use]
+extern crate serde_derive;
+extern crate serde_json;
+extern crate reqwest;
+extern crate serde;
 
-/// This struct is the root of the standard userstyles API response.
+use response::Style;
+
+pub mod response;
+
+const API_URL_BASE: &str = "https://userstyles.org/api/v1/styles/";
+
+/// Make a request to the API for a style.
+/// `id` is the identifier of the style you want to request.
 ///
-/// The request url is `https://userstyles.org/api/v1/styles/{id}`.
-pub struct Style {
-    /// id of the style, this is part of the `userstyles.org` url
-    pub id: i32,
-    /// Name of the style
-    pub name: String,
-    /// Summary of what the style does
-    pub description: String,
-    /// User that created the style
-    pub user: User,
-    /// Last update time
-    pub updated: SystemTime,
-    /// Installs per this week
-    pub weekly_install_count: i32,
-    /// Total install count
-    pub total_install_count: i32,
-    /// Rating of this style from 1 to 3
-    pub rating: Option<f32>,
-    /// File name of the thumbnail
-    pub after_screenshot_name: Option<String>,
-    /// id for newer version of this style
-    pub obsoleting_style_id: Option<i32>,
-    /// Name of the replacing style
-    pub obsoleting_style_name: Option<String>,
-    /// Indicate that style has been discontinued
-    pub obsolete: bool,
-    /// Reason why style has been removed by an admin
-    pub admin_delete_reason: Option<String>,
-    /// Reason why style has been obsoleted
-    pub obsoletion_message: Option<String>,
-    /// Screenshot fil names for this style
-    pub screenshots: Option<Vec<String>>,
-    /// License the style is published under
-    pub license: Option<String>,
-    /// Creation time
-    pub created: SystemTime,
-    /// Category this style falls in
-    pub category: String,
-    /// Subcategory or domain name
-    pub subcategory: Option<String>,
-    // I don't know what this is used for
-    pledgie_id: Option<i32>,
-    /// Additional informations about this style
-    pub additional_info: Option<String>,
-    /// The style's css with the default settings
-    pub css: String,
-    /// Comments on this style
-    pub discussions: Vec<Discussion>,
-    /// JavaScipt file name for this style
-    pub userjs_url: Option<String>,
-    /// Available settings
-    pub style_settings: Vec<StyleSetting>,
+/// # Panics
+///
+/// Panics under the following conditions:
+///
+/// - Unable to create a request
+/// - Response is not `304`
+/// - The response could not be parsed
+///
+/// # Examples
+///
+/// ```
+/// use userstyles::get_style;
+///
+/// // Style URL: "https://userstyles.org/styles/37035/github-dark"
+/// let response = get_style(37035);
+/// assert!(response.is_ok());
+/// ```
+pub fn get_style(id: u32) -> Result<Style, String> {
+    let url = [API_URL_BASE, &id.to_string()].concat();
+    let mut resp = reqwest::get(&url)
+        .map_err(|e| format!("Unable to make request to '{}': {}", url, e))?;
+
+    let status = resp.status();
+    if status != reqwest::StatusCode::Ok {
+        Err(format!(
+            "Error during API request. Expected status '304' but got '{}'",
+            status.as_u16()
+        ))
+    } else {
+        Ok(
+            resp.json::<Style>()
+                .map_err(|e| format!("Unable to parse json response: {}", e))?,
+        )
+    }
 }
 
-/// `userstyles.org` user.
-pub struct User {
-    /// id of the user
-    pub id: i32,
-    /// Username
-    pub name: String,
-    /// Email address
-    pub email: Option<String>,
-    /// Paypal email
-    pub paypal_email: Option<String>,
-    /// Homepage
-    pub homepage: Option<String>,
-    /// Bio about the user
-    pub about: Option<String>,
-    /// Default license
-    pub license: String,
-}
-
-/// Single comment about a userstyle
-pub struct Discussion {
-    /// Comment id
-    pub id: i32,
-    /// Comment text
-    pub name: String,
-    /// Rating either 0, 1, 2 or 3.
-    /// 0 means no rating was given.
-    pub rating: i32,
-    /// Creation date of this comment
-    pub created: SystemTime,
-    /// Username of the comment author
-    pub author_name: String,
-    /// User id of the comment author
-    pub author_id: i32,
-}
-
-/// Available option for a userstyle
-pub struct StyleSetting {
-    /// id of this setting
-    pub id: i32,
-    /// id of style this setting belongs to
-    pub style_id: i32,
-    /// key for request body
-    pub install_key: String,
-    /// Human-readable name of this setting
-    pub label: String,
-    /// The type of this setting.
-    /// This is eiter `color`, `image`, `text` or `dropdown`.
-    pub setting_type: String,
-    /// The available options and default
-    pub style_setting_options: Vec<StyleSettingOption>,
-}
-
-/// Available options and default for a setting
-pub struct StyleSettingOption {
-    /// id of this option
-    pub id: i32,
-    /// id of the setting this option belongs to
-    pub style_setting_id: i32,
-    /// Human-readable name of this option
-    pub label: String,
-    /// Text that will be replace the template
-    pub value: String,
-    /// Indicate that this is the default option
-    pub default: bool,
-    /// Order id for arranging options
-    pub ordinal: i32,
-    /// value for request body
-    pub install_key: String,
-}
+// pub fn get_css_with_settings(id: i32, settings: HashMap<String, String>) -> String {}
