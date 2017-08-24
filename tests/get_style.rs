@@ -1,3 +1,5 @@
+#![allow(non_snake_case)]
+
 extern crate userstyles;
 
 use userstyles::response::{Style, User};
@@ -5,7 +7,7 @@ use userstyles::get_style;
 
 #[test]
 fn with_invalid_id__is_error() {
-    let too_big_id = 999999;
+    let too_big_id = 999_999;
 
     let response = get_style(too_big_id);
 
@@ -13,7 +15,7 @@ fn with_invalid_id__is_error() {
     if let Err(e) = response {
         assert_eq!(
             e,
-            "Error during API request. Expected status '304' but got '410'"
+            "Error during API request. Expected status '200' but got '410'"
         );
     }
 }
