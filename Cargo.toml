@@ -1,8 +1,13 @@
 [package]
+authors = ["Christian Dürr <contact@christianduerr.com>"]
 name = "userstyles"
 version = "0.1.0"
 license = "GPL-3.0"
 readme = "README.md"
-authors = ["Christian Dürr <contact@christianduerr.com>"]
+keywords = ["userstyles", "style", "css", "stylish", "api"]
+categories = ["api-bindings"]
+description = "API bindings for userstyles.org."
+repository = "https://github.com/chrisduerr/userstyles-rs"
+maintenance = { status = "actively-developed" }
 
 [dependencies]
