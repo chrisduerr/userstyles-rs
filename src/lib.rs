@@ -1,3 +1,54 @@
+//! # Userstyles
+//!
+//! `Userstyles` provides API bindings for `userstyles.org`.
+//! This makes it possible to get styles, their settings and other metadata.
+//!
+//! For getting all information about a style you can use [`get_style`](fn.get_style.html).
+//! This provides a struct with most informations about a style,
+//! however it does not allow you to get a style's css with custom settings.
+//!
+//! ```rust
+//! use userstyles::get_style;
+//!
+//! // Style URL: "https://userstyles.org/styles/37035/github-dark"
+//! let style = get_style(37035);
+//! ```
+//!
+//! If you want to just access the css with the default settings you can
+//! use the `css` property of the response.
+//!
+//! ```rust
+//! use userstyles::get_style;
+//!
+//! // Style URL: "https://userstyles.org/styles/37035/github-dark"
+//! let style = get_style(37035).unwrap();
+//!
+//! let css = style.css;
+//! ```
+//!
+//! If you are only interested in the css, but want to change the settings,
+//! you can use [`get_css`](fn.get_css.html).
+//! This takes a [`HashMap`](https://doc.rust-lang.org/std/collections/struct.HashMap.html)
+//! with all keys and values you want to set. You can get the available settings from
+//! [`Style.style_settings`](response/struct.Style.html#fields)
+//! after using [`get_style`](fn.get_style.html).
+//!
+//! The API requires all keys and values to start with `ik-`, so this is added automatically by
+//! [`get_css`](fn.get_css.html). The `install_key` of
+//! [`StyleSetting`](response/struct.StyleSetting.html) and
+//! [`StyleSettingOption`](response/struct.StyleSettingOption.html) does not start with
+//! `ik-` and work without modification. But when getting keys and values from differen sources,
+//! please make sure they do not start with `ik-`.
+//!
+//! ```rust
+//! use std::collections::HashMap;
+//! use userstyles::get_css;
+//!
+//! let mut settings = HashMap::new();
+//! settings.insert(String::from("ACCENTCOLOR"), String::from("#f006a2"));
+//! let css = get_css(37035, &settings).unwrap();
+//! ```
+
 #[macro_use]
 extern crate serde_derive;
 extern crate serde_json;
@@ -74,10 +125,10 @@ pub fn get_style(id: u32) -> Result<Style, String> {
 /// use userstyles::get_css;
 ///
 /// // Style URL: "https://userstyles.org/styles/37035/github-dark"
-/// let response = get_css(37035, HashMap::new());
+/// let response = get_css(37035, &HashMap::new());
 /// assert!(response.is_ok());
 /// ```
-pub fn get_css(id: i32, settings: HashMap<String, String>) -> Result<String, String> {
+pub fn get_css(id: i32, settings: &HashMap<String, String>) -> Result<String, String> {
     // Create body from map
     let mut request_body = String::new();
     for (key, val) in settings {

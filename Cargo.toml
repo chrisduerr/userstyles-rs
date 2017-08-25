@@ -8,6 +8,7 @@ keywords = ["userstyles", "style", "css", "stylish", "api"]
 categories = ["api-bindings"]
 description = "API bindings for userstyles.org."
 repository = "https://github.com/chrisduerr/userstyles-rs"
+documentation = "https://docs.rs/userstyles"
 
 [dependencies]
 serde_derive = "1.0.11"
