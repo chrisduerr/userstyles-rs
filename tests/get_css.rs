@@ -2,16 +2,33 @@
 
 extern crate userstyles;
 
+use userstyles::response::{Style, StyleSetting, StyleSettingOption};
 use std::collections::HashMap;
-use userstyles::get_css;
 
 #[test]
 fn with_no_settings__is_correct_css() {
-    let id = 1;
-    let map = HashMap::new();
+    let mut style = Style::default();
+    style.css = String::from("foobar");
 
-    let response = get_css(id, &map);
+    let response = style.get_css(None);
 
-    assert!(response.is_ok());
-    assert_eq!(response.unwrap(), "*{ color: red !important; }");
+    assert_eq!(response, "foobar");
+}
+
+#[test]
+fn with_settings__is_correct_css() {
+    let mut option = StyleSettingOption::default();
+    option.default = true;
+    let mut settings = StyleSetting::default();
+    settings.install_key = String::from("bar");
+    settings.style_setting_options = vec![option];
+    let mut style = Style::default();
+    style.css = String::from("foo/*[[ik-bar]]*/");
+    style.style_settings = vec![settings];
+    let mut map = HashMap::new();
+    map.insert(String::from("bar"), String::from("bar"));
+
+    let response = style.get_css(Some(map));
+
+    assert_eq!(response, "foobar");
 }

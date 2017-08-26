@@ -6,8 +6,6 @@
 This makes it possible to get styles, their settings and other metadata.
 
 For getting all information about a style you can use `get_style`.
-This provides a struct with most informations about a style,
-however it does not allow you to get a style's css with custom settings.
 
 ```rust
 use userstyles::get_style;
@@ -16,32 +14,33 @@ use userstyles::get_style;
 let style = get_style(37035);
 ```
 
-If you want to just access the css with the default settings you can
-use the `css` property of the response.
+If you just want to access the css with the default settings you can
+use the `get_css` method with `None` as parameter.
 
 ```rust
-use userstyles::get_style;
+use userstyles::response::Style;
 
-// Style URL: "https://userstyles.org/styles/37035/github-dark"
-let style = get_style(37035).unwrap();
+let style = Style::default();
 
-let css = style.css;
+let css = style.get_css(None);
 ```
 
-If you are only interested in the css, but want to change the settings, you can use `get_css`.
-This takes a `HashMap` with all keys and values you want to set.
-You can get the available settings from `Style.style_settings` after using `get_style`.
+If you are interested in the css, but want to change the settings,
+you can also use `get_css`. This takes a `HashMap` with all keys and values you want to set.
+You can get all the available settings from `Style.style_settings`.
 
-The API requires all keys and values to start with `ik-`, so this is added automatically by `get_css`.
-The `install_key` of `StyleSetting` and `StyleSettingOption` does not start with
-`ik-` and work without modification. But when getting keys and values from differen sources,
+The API requires all keys to start with `ik-`, so this is added automatically by
+`get_css`. The `install_key` of `StyleSetting` does not start with
+`ik-` and works without modification. But when getting keys from differen sources,
 please make sure they do not start with `ik-`.
 
 ```rust
+use userstyles::response::Style;
 use std::collections::HashMap;
-use userstyles::get_css;
 
-let mut settings = HashMap::new();
-settings.insert(String::from("ACCENTCOLOR"), String::from("#f006a2"));
-let css = get_css(37035, &settings).unwrap();
+let style = Style::default();
+let mut map = HashMap::new();
+map.insert(String::from("ACCENTCOLOR"), String::from("#f00ba2"));
+
+let css = style.get_css(Some(map));
 ```

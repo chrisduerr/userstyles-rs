@@ -1,7 +1,9 @@
+use std::collections::HashMap;
+
 /// This struct is the root of the standard userstyles API response.
 ///
 /// The request url is `https://userstyles.org/api/v1/styles/{id}`.
-#[derive(Deserialize, PartialEq, Debug)]
+#[derive(Deserialize, PartialEq, Debug, Default)]
 pub struct Style {
     /// id of the style, this is part of the `userstyles.org` url
     pub id: i32,
@@ -45,7 +47,7 @@ pub struct Style {
     pub pledgie_id: Option<i32>,
     /// Additional informations about this style
     pub additional_info: Option<String>,
-    /// The style's css with the default settings
+    /// The style's css with template placeholders
     pub css: String,
     /// Comments on this style
     pub discussions: Vec<Discussion>,
@@ -56,7 +58,7 @@ pub struct Style {
 }
 
 /// `userstyles.org` user.
-#[derive(Deserialize, PartialEq, Debug)]
+#[derive(Deserialize, PartialEq, Debug, Default)]
 pub struct User {
     /// id of the user
     pub id: i32,
@@ -93,7 +95,7 @@ pub struct Discussion {
 }
 
 /// Available option for a userstyle
-#[derive(Deserialize, PartialEq, Debug)]
+#[derive(Deserialize, PartialEq, Debug, Default)]
 pub struct StyleSetting {
     /// id of this setting
     pub id: i32,
@@ -111,7 +113,7 @@ pub struct StyleSetting {
 }
 
 /// Available options and default for a setting
-#[derive(Deserialize, PartialEq, Debug)]
+#[derive(Deserialize, PartialEq, Debug, Default)]
 pub struct StyleSettingOption {
     /// id of this option
     pub id: i32,
@@ -127,4 +129,73 @@ pub struct StyleSettingOption {
     pub ordinal: i32,
     /// value for request body
     pub install_key: String,
+}
+
+impl Style {
+    // Get a HashMap with all the default setting keys and vals
+    fn get_default_settings(&self) -> HashMap<String, String> {
+        let mut map = HashMap::new();
+
+        for setting in &self.style_settings {
+            for option in &setting.style_setting_options {
+                if option.default {
+                    map.insert(setting.install_key.clone(), option.value.clone());
+                    break;
+                }
+            }
+        }
+
+        map
+    }
+
+    /// Get the CSS of a style. This uses the style's default settings unless
+    /// `settings` exists and provides an override. The elements of `settings`
+    /// are always prioritized over the defaults.
+    ///
+    /// This automatically prepends `ik-` to every key in `settings`.
+    /// So `ACCENTCOLOR` will be `ik-ACCENTCOLOR`.
+    /// This is required for correctly replacing templates.
+    ///
+    /// # Examples
+    /// ```rust
+    /// use std::collections::HashMap;
+    /// use userstyles::response::Style;
+    ///
+    /// let style = Style::default();
+    /// let mut map = HashMap::new();
+    /// map.insert(String::from("ACCENTCOLOR"), String::from("#f00ba2"));
+    ///
+    /// let css = style.get_css(Some(map));
+    /// ```
+    pub fn get_css(&self, settings: Option<HashMap<String, String>>) -> String {
+        // If `settings` is none, create an empty map
+        let settings = if let Some(map) = settings {
+            map
+        } else {
+            HashMap::new()
+        };
+
+        // Create return value
+        let mut css = self.css.clone();
+
+        // Get default settings
+        let defaults = self.get_default_settings();
+
+        // Iterate over all settings
+        for (key, mut val) in &defaults {
+            // Replace defaults with user overrides
+            if let Some(value) = settings.get(key) {
+                val = value;
+            }
+
+            // Add `ik-` to get the correct key
+            let key = ["/*[[ik-", key, "]]*/"].concat();
+
+            // Replace all instances of `key` with `val`
+            css = css.replace(&key, val);
+        }
+
+        // Return the rendered CSS
+        css
+    }
 }
