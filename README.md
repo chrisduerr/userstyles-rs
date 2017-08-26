@@ -1,4 +1,4 @@
-# Userstyles [![Build Status](https://img.shields.io/crates/v/rustc-serialize.svg?style=flat-square)](https://crates.io/crates/userstyles)
+# Userstyles [![Build Status](https://img.shields.io/crates/v/userstyles.svg?style=flat-square)](https://crates.io/crates/userstyles)
 
 #### [Documentation](https://docs.rs/userstyles)
 
