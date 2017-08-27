@@ -29,12 +29,6 @@
 //! with all keys and values you want to set. You can get all the available settings from
 //! [`Style.style_settings`](response/struct.Style.html#fields).
 //!
-//! The API requires all keys to start with `ik-`, so this is added automatically by
-//! [`get_css`](response/struct.Style.html#method.get_css). The `install_key` of
-//! [`StyleSetting`](response/struct.StyleSetting.html#fields) does not start with
-//! `ik-` and works without modification. But when getting keys from differen sources,
-//! please make sure they do not start with `ik-`.
-//!
 //! ```rust
 //! use userstyles::response::Style;
 //! use std::collections::HashMap;

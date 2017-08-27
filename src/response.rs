@@ -152,10 +152,6 @@ impl Style {
     /// `settings` exists and provides an override. The elements of `settings`
     /// are always prioritized over the defaults.
     ///
-    /// This automatically prepends `ik-` to every key in `settings`.
-    /// So `ACCENTCOLOR` will be `ik-ACCENTCOLOR`.
-    /// This is required for correctly replacing templates.
-    ///
     /// # Examples
     /// ```rust
     /// use std::collections::HashMap;
@@ -188,8 +184,8 @@ impl Style {
                 val = value;
             }
 
-            // Add `ik-` to get the correct key
-            let key = ["/*[[ik-", key, "]]*/"].concat();
+            // Make key into template
+            let key = ["/*[[", key, "]]*/"].concat();
 
             // Replace all instances of `key` with `val`
             css = css.replace(&key, val);

@@ -23,7 +23,7 @@ fn with_settings__is_correct_css() {
     settings.install_key = String::from("bar");
     settings.style_setting_options = vec![option];
     let mut style = Style::default();
-    style.css = String::from("foo/*[[ik-bar]]*/");
+    style.css = String::from("foo/*[[bar]]*/");
     style.style_settings = vec![settings];
     let mut map = HashMap::new();
     map.insert(String::from("bar"), String::from("bar"));
@@ -31,4 +31,15 @@ fn with_settings__is_correct_css() {
     let response = style.get_css(Some(map));
 
     assert_eq!(response, "foobar");
+}
+
+#[test]
+fn with_allo_style__contans_custom_setting() {
+    let style = userstyles::get_style(146771).unwrap();
+    let mut map = HashMap::new();
+    map.insert(String::from("ACCENTCOLOR"), String::from("#ff00ff"));
+
+    let response = style.get_css(Some(map));
+
+    assert!(response.contains("#ff00ff"));
 }
