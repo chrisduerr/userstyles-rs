@@ -37,7 +37,7 @@
 //! let mut map = HashMap::new();
 //! map.insert(String::from("ACCENTCOLOR"), String::from("#f00ba2"));
 //!
-//! let css = style.get_css(Some(map));
+//! let css = style.get_css(Some(&mut map));
 //! ```
 
 #[macro_use]
@@ -93,3 +93,4 @@ pub fn get_style(id: u32) -> Result<Style, String> {
         )
     }
 }
+

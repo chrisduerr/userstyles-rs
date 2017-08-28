@@ -161,14 +161,16 @@ impl Style {
     /// let mut map = HashMap::new();
     /// map.insert(String::from("ACCENTCOLOR"), String::from("#f00ba2"));
     ///
-    /// let css = style.get_css(Some(map));
+    /// let css = style.get_css(Some(&mut map));
     /// ```
-    pub fn get_css(&self, settings: Option<HashMap<String, String>>) -> String {
+    pub fn get_css(&self, settings: Option<&mut HashMap<String, String>>) -> String {
         // If `settings` is none, create an empty map
+        let empty_map;
         let settings = if let Some(map) = settings {
             map
         } else {
-            HashMap::new()
+            empty_map = HashMap::new();
+            &empty_map
         };
 
         // Create return value
@@ -195,3 +197,4 @@ impl Style {
         css
     }
 }
+

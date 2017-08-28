@@ -37,5 +37,5 @@ let style = Style::default();
 let mut map = HashMap::new();
 map.insert(String::from("ACCENTCOLOR"), String::from("#f00ba2"));
 
-let css = style.get_css(Some(map));
+let css = style.get_css(Some(&mut map));
 ```

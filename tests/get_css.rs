@@ -28,7 +28,7 @@ fn with_settings__is_correct_css() {
     let mut map = HashMap::new();
     map.insert(String::from("bar"), String::from("bar"));
 
-    let response = style.get_css(Some(map));
+    let response = style.get_css(Some(&mut map));
 
     assert_eq!(response, "foobar");
 }
@@ -39,7 +39,7 @@ fn with_allo_style__contans_custom_setting() {
     let mut map = HashMap::new();
     map.insert(String::from("ACCENTCOLOR"), String::from("#ff00ff"));
 
-    let response = style.get_css(Some(map));
+    let response = style.get_css(Some(&mut map));
 
     assert!(response.contains("#ff00ff"));
 }
