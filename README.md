@@ -1,5 +1,11 @@
 # Userstyles [![Build Status](https://img.shields.io/crates/v/userstyles.svg?style=flat-square)](https://crates.io/crates/userstyles)
 
+## DEPRECATED
+
+The userstyles.org website does not seem to offer an API anymore.
+All existing API calls will resolve with a server error (500).
+Because of this, this crate is deprecated.
+
 #### [Documentation](https://docs.rs/userstyles)
 
 `Userstyles` provides API bindings for `userstyles.org`.
